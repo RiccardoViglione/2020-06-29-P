@@ -5,9 +5,12 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.PremierLeague.model.Adiacenza;
 import it.polito.tdp.PremierLeague.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,7 +42,7 @@ public class FXMLController {
     private TextField txtMinuti; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbMese"
-    private ComboBox<?> cmbMese; // Value injected by FXMLLoader
+    private ComboBox<Month> cmbMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM1"
     private ComboBox<?> cmbM1; // Value injected by FXMLLoader
@@ -52,16 +55,48 @@ public class FXMLController {
 
     @FXML
     void doConnessioneMassima(ActionEvent event) {
+    	if(!model.grafoCreato()) {
+    		this.txtResult.appendText("creare prima grafo");
+    	return;
+    	}
+    	for(Adiacenza a:this.model.getMassimo()) {
+    		this.txtResult.appendText(a.toString()+"\n");
+    	}
     	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	this.txtResult.clear();
+    	Month mese=this.cmbMese.getValue();
+    	if(mese==null) {
+    		this.txtResult.appendText("Selezioanre un mese dalla tendina");
+    		return;
+    	}
+    	int min;
+    	try {
+    	 min=Integer.parseInt(txtMinuti.getText());
+    	}catch(NumberFormatException e) {
+    		this.txtResult.appendText("Inserire minuti tra 0 e 90");
+return;    		
+    	}
     	
+    	if(min<1||min>90) {
+    		this.txtResult.appendText("Inserire minuti tra 0 e 90");
+    		return;
+    		
+    		
+    	}
+this.model.creaGrafo(mese,min);
+    	
+    	txtResult.appendText("Grafo creato!\n");
+    	txtResult.appendText("# Vertici : " + this.model.nVertici() + "\n");
+    	txtResult.appendText("# Archi : " + this.model.nArchi() + "\n");
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
+    	
     	
     }
 
@@ -79,7 +114,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
-  
+  this.cmbMese.getItems().addAll(Month.values());
     }
     
     
